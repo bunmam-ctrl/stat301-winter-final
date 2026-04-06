@@ -1,0 +1,161 @@
+---
+title: "Executive Summary "
+subtitle: |
+  | Executive Summary 
+  | Data Science 2 with R (STAT 301-2)
+author: "Chau Tran"
+pagetitle: "Executive Summary Chau Tran"
+date: today
+
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    toc-location: left
+    embed-resources: true
+    link-external-newwindow: true
+
+execute:
+  warning: false
+  echo: false
+
+from: markdown+emoji
+reference-location: margin
+citation-location: margin
+---
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+[Tran Chau's Github Repo for Final Project](https://github.com/stat301-2-2025-winter/final-project-2-bunmam-ctrl.git)
+
+:::
+
+## A. Introduction
+
+This project develops a **predictive model** to classify home health agencies as `High` or `Low` quality based on key performance indicators such as patient outcomes, service effectiveness, and compliance with medical guidelines. Using **machine learning classification techniques**, the model analyzes agency characteristics, care delivery metrics, safety compliance, and financial performance to provide data-driven insights.
+
+The [Home Health Care Agencies Dataset](https://data.cms.gov/provider-data/dataset/6jpm-sxkc#data-table) from the **Centers for Medicare & Medicaid Services (CMS)** serves as the foundation, offering comprehensive information on Medicare-registered providers. The target variable, `Quality of Patient Care Star Category`, is derived from CMS’s **1–5 star rating**, transformed into a binary classification.
+
+This model has broad applications: 
+
+- ***Patients & Families*** 
+
+  - Identify high-quality providers for informed healthcare decisions.  
+  
+- ***Healthcare Providers*** 
+
+  - Pinpoint areas for improvement to enhance care quality and regulatory compliance. 
+  
+- ***Policymakers & Regulators***
+
+  - Monitor agencies, enforce quality standards, and promote accountability.  
+
+By increasing transparency and supporting data-driven decision-making, this model aims to improve healthcare quality and prevent failures in home health services.
+
+## B. Data Overview
+
+This predictive model applies machine learning classification techniques to evaluate home health agency quality, distinguishing between high- and low-quality agencies based on agency characteristics, patient outcomes, care effectiveness, and financial performance. By leveraging insights from **12,015 observations** and **35 variables** sourced from the [Home Health Care Agencies Dataset](https://data.cms.gov/provider-data/dataset/6jpm-sxkc#data-table), the model provides actionable intelligence for multiple stakeholders (@tbl-hhs-summary). Patients and families can use it to identify top-performing agencies for better care outcomes, healthcare administrators can pinpoint areas for operational improvement, and policymakers can enforce quality standards more effectively.
+
+```{r}
+#| label: tbl-hhs-summary
+#| tbl-cap: "Summary Statistics of the Home Health Care Agencies Dataset."
+#| echo: false
+
+load("predictor_check/hhs_summary.rda")
+knitr::kable(hhs_summary)
+```
+
+The dataset includes agency service availability, timeliness of care, patient functional improvements, safety compliance, and financial performance metrics. To address **class imbalance** of the target variables, the original 1–5 star ratings were transformed into a **binary classification system**, with agencies categorized as `High` **(≥3.5 stars)** or `Low` **(<3.5 stars)**. Additionally, missing data—comprising **23% of the dataset**—was removed or imputed to mitigate bias in quality assessments (@tbl-hhs-summary).
+
+## C. Method 
+
+This study frames Quality of Patient Care Star Ratings as a **binary classification problem**, categorizing agencies as`High` **(≥3.5 stars)** or `Low` **(<3.5 stars)** to address class imbalance and improve model interpretability. The dataset is split **80/20** into training and testing sets, using **stratified sampling** to maintain proportional representation. To enhance model reliability, **10-fold cross-validation with 5 repeats** is applied, ensuring stable performance estimates and minimizing overfitting. This approach ensures the model effectively differentiates between high- and low-quality agencies while maintaining fairness and generalizability.
+
+The following table summarizes the different models used for classification, detailing their descriptions and key hyperparameters that are fine-tuned to optimize performance.
+
+| Model Type          | Description | Tuned Parameters |
+|:---------------------|-----------------:|-----------------:|
+| Null Model         |  Baseline model that predicts the most frequent class, providing a reference point for evaluation  |    None |
+| Logistic Regression | Simple, interpretable model that assumes a linear relationship between features and the response variable        |    None| 
+| Elastic Net  |  Regularized logistic regression that applies a penalty to prevent overfitting and improve generalization     |       `mixture` and `penalty`|   
+| K-Nearest Neighbors (KNN) | Distance-based model that classifies observations based on their proximity to training examples | `neighbors`   |            
+| Random Forest        | Ensemble model that reduces variance by combining multiple decision trees, capturing non-linear patterns         |    `mtry`, `trees`, and `min_n`|  
+| Boosted Tree         | Gradient boosting model that iteratively improves weak learners to enhance predictive performance |    `mtry`, `trees`, `min_n`, and `learn_rate` |    
+
+: Overview of Machine Learning Models and Tuned Parameters for Quality Star Prediction {#tbl-model-use .striped .hover}
+
+To ensure optimal model performance, two preprocessing recipes—basic and complex—are implemented, each with versions tailored for regression-based and tree-based models, addressing missing values, categorical encoding, and feature scaling.
+
+
+| **Preprocessing Step**         | **Basic Recipe (Regression-Based Models)** | **Basic Recipe (Tree-Based Models)** | **Complex Recipe (Regression-Based Models)** | **Complex Recipe (Tree-Based Models)** |
+|--------------------------------|--------------------------------------------|-------------------------------------|----------------------------------------------|--------------------------------------|
+| **Removal of Non-Predictive Variables** | Exclude irrelevant features (`state`, `provider name`, etc.) | Same as regression-based models | Same as basic recipe | Same as basic recipe |
+| **Filtering Out Zero-Variance Predictors** | Remove features with no variability | Remove features with no variability | Same as basic recipe | Same as basic recipe |
+| **Handling Missing Data (Numerical)** | Impute missing values using **mean** | Impute missing values using **mean** | Same as basic recipe | Same as basic recipe |
+| **Handling Missing Data (Categorical)** | Impute missing values using **mode** | Impute missing values using **mode** | Same as basic recipe | Same as basic recipe |
+| **Encoding Categorical Variables** | **Dummy encoding** (drop one reference category) | **One-hot encoding** (retain all levels) | Same as basic recipe | Same as basic recipe |
+| **Feature Scaling** | Normalize numerical features for standardization | Standardization optional for consistency | Same as basic recipe | Same as basic recipe |
+| **Handling Skewed Distributions** | Not applied | Not applied | **Log10 transformation** for extremely skewed features (`num_episodes`) | **Log10 transformation** for extremely skewed features (`num_episodes`) |
+| **Incorporating Interaction Terms** | Not applied | Not applied | Identify interactions via **scatterplot analysis** and add significant terms | Not applied (tree models inherently capture interactions) |
+
+: Preprocessing Steps for Regression-Based and Tree-Based Models Across Basic and Complex Recipes^[For more information about data splitting process, recipes building, and hyperparameter tuning, refer to [**Method** in *Tran_Chau_final_report.html*](file:///Users/bong_banana/Desktop/Stat-301-2/final-project-2-bunmam-ctrl/Tran_Chau_final_report.html#method)] {#tbl-recie-summary .striped .hover}
+ 
+ 
+`ROC-AUC` is the primary metric used to evaluate model performance, as it ensures both accurate classification and strong discriminative ability. `Accuracy` provides a measure of correctly classified agencies, making it a useful indicator after dataset balancing. However, **`ROC-AUC` is prioritized** because it evaluates the model’s ability to distinguish between high- and low-quality agencies across various probability thresholds, ensuring robustness in real-world decision-making. By emphasizing these metrics, the final model is chosen for its ability to achieve both overall correctness and effective class separation.
+
+## D. Model Selection 
+
+According to @tbl-roc-complex, the ***boosted tree model with complex recipes*** emerged as the best-performing model, achieving an `accuracy` of **0.979** and, more importantly, an `ROC-AUC` of **0.998**, demonstrating exceptional predictive reliability. With an `accuracy` of **97.9%**, the model correctly classifies healthcare agencies with minimal errors, ensuring precise decision-making in policy planning and patient referrals. Its `ROC-AUC` of **0.998** highlights its near-perfect ability to distinguish between high- and low-quality agencies, minimizing misclassification risks. Additionally, its small standard error values ($6.09 × 10^{-4}$ for `accuracy` and $8.96 × 10^{-5}$ for `ROC-AUC`) confirm its stability across different data samples. The model’s superior performance is attributed to its ability to capture complex, nonlinear relationships, optimized through **2,000 trees** and fine-tuned hyperparameters (`mtry` = 5, `min_n` = 2, and `learn_rate` = 0.0541 according to @tbl-bt-parameter).^[For more analysis on different models performing, refer to [**Model Building** in *Tran_Chau_final_report.html*](file:///Users/bong_banana/Desktop/Stat-301-2/final-project-2-bunmam-ctrl/Tran_Chau_final_report.html#model-building)]
+ 
+
+![Performance comparison of different predictive models using the complex recipe.](metrics_table/evaluate_complex_reformat.png){#tbl-roc-complex}
+
+
+```{r}
+#| label: tbl-bt-parameter
+#| tbl-cap: "Optimized Parameters for the Boosted Tree Model."
+#| echo: false
+#| 
+load(here::here("final_fitting/bt_hyperameter.rda"))
+knitr::kable(bt_hyperameter, digits = 4)
+```
+
+## E. Final Model Analysis
+
+The final ***boosted tree model*** was evaluated on the testing dataset to determine its effectiveness in distinguishing between high- and low-quality healthcare agencies. As shown in @tbl-final-metrics, the model demonstrated **exceptional predictive performance**, achieving an `accuracy` of **0.976**, meaning it correctly classified **97.6%** of agencies. This high accuracy indicates that the model consistently makes correct predictions, ensuring that healthcare agencies are categorized with minimal errors.  
+
+```{r}
+#| label: tbl-final-metrics
+#| tbl-cap: "Performance metrics of the final boosted tree model, evaluated using Accuracy and ROC-AUC"
+#| echo: false
+
+load(here::here("final_fitting/hhs_final_metrics.rda"))
+knitr::kable(hhs_final_metrics, digits = 3)
+```
+
+Moreover, the model’s `ROC-AUC` of **0.998** highlights its outstanding ability to differentiate between high- and low-quality agencies across a range of decision thresholds. This means the model reliably assigns higher probability scores to high-quality agencies and lower scores to low-quality ones, minimizing both **false positives** (misclassifying low-quality agencies as high-quality) and **false negatives** (misclassifying high-quality agencies as low-quality). In real-world applications, such a high `ROC-AUC` is critical, as it ensures that decision-makers—such as healthcare regulators, policymakers, and patients—can trust the model's predictions when evaluating agency quality.^[For more analysis on the final model's performance on the testing set, refer to [**Final Model Analysis** in *Tran_Chau_final_report.html*](file:///Users/bong_banana/Desktop/Stat-301-2/final-project-2-bunmam-ctrl/Tran_Chau_final_report.html#final-model-analysis)]
+
+## F. Conclusions
+
+The ***boosted tree model*** outperformed regression-based approaches, achieving high `accuracy` **(0.976)** and near-perfect `ROC-AUC` **(0.998)**, making it a reliable tool for classifying healthcare agencies. However, challenges remain in interpretability and practical application.  
+
+
+## G. Future Directions
+
+1. Expand to multiclass classification for nuanced quality assessment.  
+
+2. Improve interpretability with SHAP^[[A Unified Approach to Interpreting Model Predictions](https://doi.org/10.48550/arXiv.1705.07874)] and feature importance.  
+
+3. Refine feature engineering by selecting only meaningful interactions.  
+
+4. Optimize decision thresholds for real-world policy applications.  
+
+Enhancing these areas will improve both predictive accuracy and practical usability, making the model more effective for healthcare decision-making.^[For more elaboration on future direction, refer to [**Section B** of *Conclusion* in *Tran_Chau_final_report.html*](file:///Users/bong_banana/Desktop/Stat-301-2/final-project-2-bunmam-ctrl/Tran_Chau_final_report.html#b.-future-research-directions)]
+
+
+## H. Use of Generative AI
+
+I used ChatGPT to improve sentence flow, check grammar, and make my writing more concise. 
+
+
+

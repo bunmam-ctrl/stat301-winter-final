@@ -1,0 +1,385 @@
+---
+title: "Appendix Report"
+subtitle: |
+  | Final Project 
+  | Data Science 2 with R (STAT 301-2)
+author: "Chau Tran"
+pagetitle: "Appendix Chau Tran"
+date: today
+
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    toc-location: left
+    embed-resources: true
+    link-external-newwindow: true
+    
+execute:
+  warning: false
+
+from: markdown+emoji 
+reference-location: margin
+citation-location: margin
+---
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+[Tran Chau's Github Repo for Final Project](https://github.com/stat301-2-2025-winter/final-project-2-bunmam-ctrl.git)
+
+:::
+
+## A. Distribution Analysis of Key Healthcare Metric
+
+The following figures depict the distribution of various healthcare quality indicators, most of which are expressed as percentages. Because percentage-based data are naturally constrained between **0 and 100**, they cannot undergo transformations that enforce normal distribution, such as ***log transformations***. However, according to @fig-finance-dis, `num_episodes`, which ranges from **0 to 40,000** and is not a percentage, exhibits a ***heavily right-skewed*** distribution. Given its wide numerical range, ***log10 transformation*** is an appropriate technique to reduce skewness and produce a more normal-like distribution for improved interpretability.
+
+
+### 1. Timeliness and Care Delivery Measures 
+
+According to @fig-delivery-dis,, `timely_care` exhibits an ***extreme left-skew***, with a large concentration of observations at **95-100%**, indicating that many home healthcare agencies consistently provide care on time. This suggests that timely patient care is a standardized priority across most agencies, likely driven by Medicare quality requirements and operational efficiencies.
+
+![Distribution of Timeliness and Care Delivery Measures. The left histogram represents the percentage of timely patient care, while the right histogram shows the flu shot assessment rate, both crucial indicators of healthcare efficiency and preventive care adherence.](EDA_predict_var/delivery_dis.png){#fig-delivery-dis}
+
+
+In contrast, `flu_shot_check` follows a ***more normal-like distribution***, centered around **60-80%**, but with a long tail on left ends @fig-delivery-dis). This distribution suggests greater variability in flu vaccination rates, potentially influenced by regional policies, patient preferences, or differences in provider emphasis on preventive care. The contrast between these two measures highlights that while timely patient care is nearly universal, flu vaccination adherence remains inconsistent.
+
+### 2. Patient Functional Improvement and Skin Integrity 
+
+The distribution of patient functional improvement  across five key outcome categories—`improve_bathing`, `improve_breathing`, `improve_walking`, `improve_bed_transfer`, and `improve_medcine`—reveals substantial variability in rehabilitation success rates. According to @fig-improve-dis, the **median improvement** across all categories is relatively high, typically around ***75%***, indicating that most patients experience significant functional recovery. However, the **wide interquartile range (IQR)** suggests that patient outcomes differ considerably across agencies. Notably, **outliers are present** at both lower end, implying that while some agencies report exceptional recovery rates, others struggle to achieve consistent improvements. Additionally, the bottom whiskers extend toward ***0%***, signaling that certain facilities report minimal or no improvement for some patients. These discrepancies could stem from differences in care quality, patient demographics, or reporting inconsistencies across agencies.  
+
+![Distribution of Patient Functional Improvement and Skin Integrity Changes. The top boxplots show the improvement percentages across different patient outcome categories, such as bathing, medication use, and mobility. The bottom boxplot highlights the percentage of post-acute care patients experiencing skin integrity issues.](EDA_predict_var/improve_dis.png){#fig-improve-dis}
+
+`improve_skin ` distribution shows a ***right-skewed pattern*** with the majority of cases clustered at **0%**, meaning most agencies report no significant deterioration in skin integrity. However, a small fraction of patients exhibit skin integrity issues up to **~5%**, suggesting that some facilities face challenges in preventing pressure ulcers or other complications. The presence of ***outliers beyond the IQR*** indicates that certain providers struggle with maintaining skin integrity for a subset of patients, potentially due to differences in risk factors, preventive care practices, or resource availability.  
+
+### 3. Medication and Safety Compliance
+
+@fig-safe-dis reveals distinct patterns in two key indicators: `med_issue_resolved` and `fall_injury_rate`. The `med_issue_resolved` exhibits a ***highly left-skewed*** distribution, with most values concentrated near **100%**, indicating that the majority of healthcare agencies consistently adhere to timely intervention protocols. This suggests that physician-driven care recommendations are generally well-executed across agencies, ensuring prompt medical decisions for patients.  
+
+![ Distribution of Medication and Safety Compliance Measures. The left histogram visualizes the percentage of physician-recommended actions completed on time, while the right histogram represents the rate of residents experiencing falls resulting in major injuries.](EDA_predict_var/med_safe_dis.png){#fig-safe-dis}
+
+
+In contrast, the `fal_injury_rate` follows a ***right-skewed*** distribution, with most values clustering between **0-5%** but with **a few extreme outliers** where fall rates are significantly higher @fig-safe-dis. This distribution indicates that fall prevention strategies are effective for most agencies, as the majority maintain low injury rates. However, the presence of extreme cases suggests that some facilities struggle with patient safety, potentially due to inadequate fall prevention measures, differences in patient populations, or inconsistent monitoring protocols.
+
+
+### 4. Care Coordination and Information Transfer
+
+@fig-care-trans highlights key differences in `discharge_score`, `transfer_to_patient`, and `transfer_to_provider`. `discharge_score` exhibit a ***left-skewed*** distribution, with most patients scoring between **50 and 80**. This suggests that the majority of patients experience moderate-to-high recovery outcomes, while a smaller subset of patients falls below this range. The skewness indicates that while many patients regain substantial functionality post-care, some agencies may struggle with achieving consistent recovery outcomes across all cases.  
+ 
+![Distribution of Care Coordination and Information Transfer measures. The top histogram displays the discharge function scores. The bottom boxplot illustrates the distribution of health information transfer percentages, distinguishing between transfers to patients and to providers.](EDA_predict_var/care_trans_dis.png){#fig-care-trans}
+
+The health information transfer rates display two distinct distribution patterns. `transfer_to_patient` is highly concentrated around **85-100%**, indicating that most agencies prioritize direct communication with patients regarding their care plans. In contrast, `transfer_to_provider` exhibits a ***broader distribution***, with a lower median value, suggesting greater variability in how efficiently healthcare providers receive critical patient information. This discrepancy may reflect differences in documentation practices, electronic health record integration, or provider communication protocols. 
+
+
+### 5. Performance Metrics
+
+@Ffig-perform-dis reveals distinct trends in `ppr_rate`, `pph_rate`, and `dtc_rate`. Both `ppr_rate` and `pph_rate` exhibit a ***right-skewed*** distribution, with most agencies reporting readmission rates between **3.7-5%** and hospitalization rates between **8-12%**. The skewness suggests that while the majority of agencies maintain relatively low rates, a subset experiences higher-than-average preventable readmissions and hospitalizations, potentially indicating differences in care quality, patient risk factors, or discharge planning effectiveness.
+
+![Distribution of Performance Metrics. The boxplots display key performance indicators, including potentially preventable readmissions, potentially preventable hospitalizations, and discharge to the community rates.](EDA_predict_var/perform_dis.png){#fig-perform-dis}
+
+`dtc_rate` is more **left-skwed**, with most values centered around **75-85%**. A significant portion of agencies report rates approaching **100%**, reflecting a strong emphasis on transitioning patients back to home-based care whenever possible (@fig-perform-dis). However, the presence of ***long tails*** in these distributions suggests variability in hospital readmission and discharge outcomes. These differences may be influenced by patient demographics, agency resources, and post-discharge support availability.
+
+### 6. Medicare Spending per Episode
+
+@fig-medicare-dis exhibits an  ***extreme left-skewed*** pattern, indicating that most home healthcare agencies spend at or above the national average, with fewer agencies operating at significantly lower costs. The sharp peak near ***100%*** suggests that Medicare reimbursement policies create a standardized spending structure, ensuring that the majority of providers maintain relatively consistent cost levels.  
+
+![Distribution of Medicare Spending per Episode of Care Relative to the National Average.](EDA_predict_var/medicare_index_dis.png){#fig-medicare-dis}
+
+The ***left-skewness*** also reveals that very few agencies spend significantly below the national average, meaning cost-efficient providers are uncommon (@fig-medicare-dis). This could be due to factors such as service utilization patterns, regional cost differences, or patient case complexity, which may limit opportunities for agencies to reduce costs significantly. The lack of extreme low-cost outliers suggests that while some agencies achieve modest cost savings, most providers operate within a narrow and controlled spending range. 
+
+### 7. Episode Counts Used in Medicare Cost Calculations
+
+Unlike the previous percentage-based distributions, which are naturally bounded between **0 and 100**, `num_episodes`  follows a ***highly right-skewed distribution*** in its original scale (@fig-finance-dis, upper panel). The majority of episode counts are concentrated at lower values, indicating that most home healthcare agencies handle a relatively small number of Medicare-covered episodes. However, the ***long right tail*** suggests that a subset of agencies manages significantly higher volumes, leading to extreme outliers in episode counts. This variability could be attributed to differences in agency size, regional patient demand, or operational capacity.  
+
+![ Distribution of Episodes Used in Medicare Cost Calculations. The top histogram represents the original scale of episode counts. The bottom histogram shows the log-transformed distribution.](EDA_predict_var/finance_dis.png){#fig-finance-dis}
+
+To correct this severe skewness, a ***log10 transformation*** is applied, producing a more symmetrical and normal-like distribution in the lower panel of @fig-finance-dis. This transformation effectively compresses the scale of extreme values, mitigating the disproportionate influence of high-volume agencies on statistical analyses. By improving distributional balance, the ***log10 transformation*** enhances model interpretability making it easier to analyze cost-efficiency trends and compare agencies with varying episode volumes on a standardized scale.
+
+## B. Interaction Effect of Predictor Variables 
+
+### 1. `timely_care` 
+
+![Interaction effect of timely care (x-axis) on patient care quality (y-axis). The non-parallel trend lines indicate that timely care negatively impacts discharge outcomes in high-quality agencies, while low-quality agencies show a positive trend.](interact_predict/timely_care/timely_quality.png){#fig-timely-quality}
+
+![Interaction effect of timely care (x-axis) on performance metrics (y-axis). The non-parallel trend lines suggest that timely care has a stronger impact on the change of hospitalization and readmission rates in high-quality agencies, while low-quality agencies exhibit a flatter trend, indicating a weaker association. ](interact_predict/timely_care/timely_performance.png){#fig-timely-performance}
+
+![Interaction effect of timely care (x-axis) on patient improvement metrics (y-axis). The non-parallel trend lines indicate that timely care has a stronger impact on functional recovery in low-quality agencies, while high-quality agencies show a weaker association between timeliness and patient improvement.](interact_predict/timely_care/timely_improve.png){#fig-timely-improve}
+
+
+![Non-interaction effect of timely care (x-axis) on various predictors (y-axis). The parallel trend lines suggest that timely care influences flu shot status, medication completion, skin integrity, fall injuries, and health information transfer consistently across agency quality levels, without significant interaction effects.](interact_predict/timely_care/timely_non_interact.png){#fig-timely-non}
+
+
+
+### 2. `flu_shot_check`
+
+![nteraction effect of flu shot status (x-axis) and care quality on medication adherence and discharge outcomes (y-axis). The non-parallel trend lines indicate a stronger association in low-quality agencies, where increased flu shot adherence correlates with greater improvements in medication adherence and discharge rates. ](interact_predict/flu_shot_check/flu_care.png){#fig-flu-care}
+
+![Interaction effect of flu shot adherence (x-axis) and care quality on health information transfer (y-axis. The non-parallel trend lines indicate a greater impact on low-quality agencies, where increased flu shot adherence correlates with steeper gains in health information transfer rates compared to high-quality agencies.](interact_predict/flu_shot_check/flu_transfer.png){#fig-flu-transfer}
+
+![Interaction effect of flu shot adherence (x-axis) and care quality on patient improvement metrics (y-axis). The non-parallel trend lines indicate a greater impact on low-quality agencies, where increased flu shot adherence correlates with steeper gains in patient recovery outcomes compared to high-quality agencies.](interact_predict/flu_shot_check/flu_improve.png){#fig-flu-improve}
+
+![Non-interaction effect of flu shot adherence (x-axis) on various predictors (y-axis). The parallel trend lines indicate that flu shot adherence does not significantly interact with care quality across multiple outcomes, including patient improvement, safety metrics, and cost measures.](interact_predict/flu_shot_check/flu_no_interact.png){#fig-flu-non}
+
+### 3. `improve_walking`
+
+![Interaction effect of walking improvement (x-axis) and care quality (y-axis). The non-parallel trend lines suggest that walking improvement has a greater positive impact on low-quality agencies, whereas in high-quality agencies, the effect is weaker or even negative for medication adherence.](interact_predict/improve_walking/walk_quality.png){#fig-walk-quality}
+
+
+![Interaction effect of walking improvement (x-axis) and information transfer (y-axis). The non-parallel trend lines indicate that walking improvement has a stronger association with improved health information transfer in low-quality agencies compared to high-quality agencies.](interact_predict/improve_walking/walk_transfer.png){#fig-walk-transfer}
+
+![Interaction effect of walking improvement (x-axis) and performance metrics (y-axis). The non-parallel trend lines suggest that walking improvement has a stronger impact on reducing hospitalization and readmission rates in high-quality agencies, whereas low-quality agencies show a weaker relationship. However, improvements in walking ability are more strongly associated with higher discharge to community rates in low-quality agencies.](interact_predict/improve_walking/walk_performance.png){#fig-walk-perform}
+
+
+![Interaction effect of walking improvement (x-axis) and financial metrics (y-axis). The non-parallel trend lines indicate that walking improvement has a stronger association with the number of Medicare cost calculation episodes in low-quality agencies compared to high-quality agencies.](interact_predict/improve_walking/walk_finance.png){#fig-walk-finance}
+
+
+![ Interaction effect of walking improvement (x-axis) on other patient outcomes (y-axis). The non-parallel trend lines indicate that improvements in walking ability have a stronger association with bathing ability, breathing ability, and medication adherence in low-quality agencies compared to high-quality agencies. ](interact_predict/improve_walking/walk_improve.png){#fig-walk-improve}
+
+
+![Non-interaction effect of walking improvement (x-axis) on various predictors (y-axis). The parallel trend lines suggest that walking improvement does not significantly interact with care quality across skin integrity, major fall injuries, and Medicare spending per episode. ](interact_predict/improve_walking/walk_no_interact.png){#fig-walk-no}
+### 4. `improve_bed_transfer`
+
+![Interaction effect of bed transfer improvement (x-axis) and care quality on patient outcomes (y-axis). The non-parallel trend lines indicate that bed transfer improvement has a stronger effect on both discharge function scores and timely medication completion for low-quality agencies.](interact_predict/improve_bed_transfer/bed_quality.png){#fig-bed-quality}
+
+![Interaction effect of bed transfer improvement (x-axis) and care quality on health information transfer to patients (y-axis). The non-parallel trend lines suggest that bed transfer improvement has a postive correlation with information transfer in low-quality agencies, whereas the correlation is negative in high-quality agencies.](interact_predict/improve_bed_transfer/bed_transfer.png){#fig-bed-transfer}
+
+
+![Interaction effect of bed transfer improvement (x-axis) on performance metrics (y-axis). The non-parallel trend lines suggest that bed transfer improvement has a stronger association with the change of hospitalization and readmission rates in high-quality agencies, while its impact on discharge to community rate is more pronounced in low-quality agencies.](interact_predict/improve_bed_transfer/bed_performance.png){#fig-bed-perfrom}
+
+![Interaction effect of bed transfer improvement (x-axis) and financial metrics (y-axis). The non-parallel trend lines indicate that bed transfer improvement has a greater impact on Medicare spending for high-quality agencies, where increased bed transfer improvement is associated with a steeper rise in costs compared to low-quality agencies.](interact_predict/improve_bed_transfer/bed_finance.png){#fig-bed-finance}
+
+
+
+![Interaction effect of bed transfer improvement (x-axis) and other patient outcomes (y-axis). The non-parallel trend lines suggest that bed transfer improvement has a stronger effect on patient functionality in low-quality agencies.](interact_predict/improve_bed_transfer/bed_improve.png){#fig-bed-improve}
+
+
+![Non-interaction effect of bed transfer improvement (x-axis) and medication adherence (y-axis). The parallel trend lines indicate that bed transfer improvement does not significantly interact with care quality for medication adherence, information transfer, skin integrity, and major injury prevention, suggesting similar effects across high- and low-quality agencies.](interact_predict/improve_bed_transfer/bed_no_interact.png){#fig-bed-not}
+
+### 5. `improve_bathing`
+
+![Interaction effect of bathing improvement (x-axis) and care quality on patient outcomes (y-axis).The non-parallel trend lines indicate that bathing improvement has a stronger impact on low-quality agencies, particularly in discharge function scores.](interact_predict/improve_bathing/bath_quality.png){#fig-bath-quality}
+
+![Interaction effect of bathing improvement (x-axis) and information transfer (y-axis). The non-parallel trend lines suggest that bathing improvement has a greater impact on information transfer rates in low-quality agencies.](interact_predict/improve_bathing/bath_transfer.png){#fig-bath-transfer}
+
+
+![Interaction effect of bathing improvement (x-axis) and performance metrics (y-axis). The non-parallel trend lines suggest that bathing improvement influences preventable hospitalizations, readmissions, and discharge more significantly in high-quality agencies.](interact_predict/improve_bathing/bath_performance.png){#fig-bath-perform}
+
+![Interaction effect of bathing improvement (x-axis) and financial metrics (y-axis). The non-parallel trend lines indicate that bathing improvement is associated with a slight decrease in episode counts for high-quality agencies.](interact_predict/improve_bathing/bath_finance.png){#fig-bath-finance}
+
+
+![Interaction effect of bathing improvement (x-axis) and other patient outcomes (y-axis).The non-parallel trend lines suggest that bathing improvement has a greater effect on low-quality agencies.](interact_predict/improve_bathing/bath_improve.png){#fig-bath-improve}
+
+
+![Non-interaction effect of bathing improvement (x-axis) and various predictors (y-axis). The parallel trend lines indicate no significant interaction between bathing improvement and agency quality in these outcomes.](interact_predict/improve_bathing/bath_no_interact.png){#fig-bath-no}
+
+### 6. `improve_breathing`
+
+![Interaction effect of breathing improvement (x-axis) and care quality (y-axis).The non-parallel trend lines indicate that breathing improvement has a stronger effect on discharge function scores for low-quality agencies, whereas its impact on timely medication completion is more pronounced in high-quality agencies.](interact_predict/improve_breathing/breath_quality.png){#fig-breath-quality}
+
+
+![ Interaction effect of breathing improvement (x-axis) and information transfer (y-axis). The non-parallel trend lines indicate a stronger relationship between breathing improvement and information transfer in low-quality agencies compared to high-quality agencies.](interact_predict/improve_breathing/breath_transfer.png){#fig-breath-transfer}
+
+![Interaction effect of breathing improvement (x-axis) and performance metrics (y-axis). The non-parallel trend lines suggest that breathing improvement is more strongly associated with improved hospitalization outcomes in high-quality agencies, whereas the discharge to community rate sees a more pronounced effect in low-quality agencies.](interact_predict/improve_breathing/breath_performance.png){#fig-breath-perform}
+
+
+![Interaction effect of breathing improvement (x-axis) and financial metrics (y-axis). The non-parallel trend lines indicate that breathing improvement has a stronger positive correlation with the number of Medicare episodes used in cost calculations for low-quality agencies, as evidenced by the steeper slope. In contrast, high-quality agencies exhibit a flatter trend, suggesting a weaker association.](interact_predict/improve_breathing/breath_finance.png){#fig-breath-finance}
+
+
+![Non-interaction effect of breathing improvement (x-axis) and various predictors (y-axis. The parallel trend lines indicate that breathing improvement influences both high- and low-quality agencies similarly across these metrics.](interact_predict/improve_breathing/breath_no_interact.png){#fig-breath-no}
+
+### 7. `improve_medicine`
+
+![Interaction effect of medical adherence (x-axis) and care quality on timely medication completion (y-axis). The non-parallel trend lines indicate that medical adherence has a greater impact on timely completion of medication actions in high-quality agencies.](interact_predict/improve_medicine/medicine_quality.png){#fig-medcine-quality}
+
+![Interaction effect of medical adherence (x-axis) and information transfer (y-axis). The non-parallel trend lines suggest that low-quality agencies benefit more from improved medical adherence in terms of information transfer.](interact_predict/improve_medicine/medicine_transfer.png){#fig-medcine-transfer}
+
+![Interaction effect of medical adherence (x-axis) and performance metrics (y-axis). The non-parallel trend lines indicate that medical adherence has a stronger association with hospitalization and readmission rates in high-quality agencies, whereas its effect on discharge rates is more pronounced in low-quality agencies.](interact_predict/improve_medicine/medicine_performance.png){#fig-medcine-performance}
+
+
+![Non-interaction effect of medical adherence (x-axis) on various predictors (y-axis). The parallel trend lines across multiple outcomes, including skin integrity, timely medication completion, major fall injuries, and Medicare spending, suggest that medical adherence influences both high- and low-quality agencies similarly without significant interaction effects.](interact_predict/improve_medicine/medicine_non_interact.png){#fig-medcine-quality}
+
+
+### 8. `improve_skin`
+
+
+![Interaction effect of skin integrity improvement (x-axis) and health information transfer (y-axis). The non-parallel trend lines indicate that the improvement in skin integrity has a stronger impact on information transfer in high-quality agencies.](interact_predict/improve_skin/skin_transfer.png){#fig-skin-transfer}
+
+
+
+![Interaction effect of skin integrity improvement (x-axis) and various performance metrics (y-axis).The non-parallel trend lines indicate that skin integrity improvement has a greater impact on discharge function scores and readmission rates in high-quality agencies, while its effect on timely medication completion follows the opposite trend, with a negative correlation in low-quality agencies.](interact_predict/improve_skin/skin_perform.png){#fig-skin-perform}
+
+
+
+![Interaction effect on skin integrity improvement (x-axis) and the number of Medicare cost calculation episodes (y-axis). The non-parallel trend lines indicate an oppositte correlation between high- and low-quality agencies.](interact_predict/improve_skin/skin_finance.png){#fig-skin-finance}
+
+
+![Non-interaction effect of skin integrity improvement (x-axis) and various predictors (y-axis). The parallel trend lines suggest that skin integrity improvement has a uniform impact across both high- and low-quality agencies.](interact_predict/improve_skin/skin_no_interact.png){#fig-skin-no}
+
+### 9. `med_issue_resolved`
+
+![Interaction effect of timely medical recommendations (x-axis) and discharge function score (y-axis). The non-parallel trend lines indicate that timely recommendations have a stronger positive impact on discharge function scores in low-quality agencies.](interact_predict/med_issue_resolved/med_care.png){#fig-med-care}
+
+
+![Non-interaction effect of timely medical recommendations (x-axis) and various outcome measures (y-axis). The parallel trend lines indicate that timely recommendations influence these outcomes similarly across high- and low-quality agencies.](interact_predict/med_issue_resolved/med_non_interact.png){#fig-med-no}
+
+
+### 10. `fall_injury_rate`
+
+![Interaction effect of major injury falls (x-axis) and various outcome measures (y-axis).The non-parallel trend lines indicate that major injury falls have a stronger negative impact on discharge to the community and a greater positive association with Medicare cost episodes in high-quality agencies. Additionally, the relationships with preventable readmissions and transfer of health information to providers is more pronounced are high-quality agencies.](interact_predict/fall_injury_rate/injury_interact.png){#fig-injury-interact}
+
+
+![Interaction effect of major injury falls (x-axis) and multiple outcome variables (y-axis). The parallel trend lines suggest that major injury falls impact both high- and low-quality agencies similarly across these outcomes, indicating no strong interaction with agency quality.](interact_predict/fall_injury_rate/injury_non_interact.png){#fig-injury-no}
+
+
+### 11. `discharge_score`
+
+![Interaction effect of discharge function score (x-axis) and key predictors (y-axis).The non-parallel trend lines suggest that the association between discharge function score and community discharge rate is stronger in low-quality agencies. In contrast, the transfer of health information to patients exhibits an opposite slope, indicating a positive relationship in low-quality agencies compared to the negative one of high-quality agencies.](interact_predict/discharge_score/discharge_interact.png){#fig-discharge-interact}
+
+
+
+![Non-interaction effect of discharge function score (x-axis) and multiple outcome measures (y-axis). The parallel trend lines indicate that discharge function score does not significantly interact with agency quality for these predictors.](interact_predict/discharge_score/discharge_non_interact.png){#fig-discharge-no}
+
+
+### 12. `transfer_to_provider`
+
+![Interaction effect of information transfer to providers (x-axis) and the number of Medicare episodes used in cost calculations (y-axis). The non-parallel trend lines indicate a stronger postive correlation in low-quality agencies.](interact_predict/transfer_to_provider/provider_interact.png){#fig-provider-interact}
+
+
+![Non-interaction effect of information transfer to providers (x-axis) on various predictors (y-axis). The parallel trend lines indicate that information transfer to providers influences key outcomes similarly across agency quality levels.](interact_predict/transfer_to_provider/provider_non_interact.png){#fig-provider-no}
+
+### 13. `transfer_to_patient`
+
+![Interaction effect of information transfer to patients (x-axis) and the number of Medicare episodes used in cost calculations (y-axis). The non-parallel trend lines indicate an opposite relationship across agency quality levels, with a negative association in high-quality agencies and a positive correlation in low-quality agencies.](interact_predict/transfer_to_patient/patient_interact.png){#fig-patient-interact}
+
+
+
+![Non-interaction effect of information transfer to patients (x-axis) on various predictors (y-axis). The parallel trend lines suggest that information transfer does not significantly interact with agency quality in its relationship with community discharge rates, hospitalization rates, readmission rates, and Medicare spending.](interact_predict/transfer_to_patient/patient_non_interact.png){#fig-patient-no}
+
+
+### 14. `dtc_rate`
+
+![Interaction effect of discharge to community (x-axis) and the number of Medicare episodes used in cost calculations (y-axis). The non-parallel trend lines indicate a stronger positive correlation in high-quality agencies, while low-quality agencies show a flatter association.](interact_predict/dtc_rate/dtc_interact.png){#fig-dtc-interact}
+
+![Non-interaction effect of discharge to community (x-axis) on various predictors (y-axis). The parallel trend lines suggest that discharge to community rates influence both high- and low-quality agencies similarly across these metrics.](interact_predict/dtc_rate/dtc_non_interact.png){#fig-dtc-no}
+
+### 15. `pph_rate`
+
+![Non-interaction effect of potentially preventable hospitalizations (x-axis) and different cost-related metrics (y-axis). The parallel trend lines indicate that preventable hospitalizations influence both high- and low-quality agencies in a similar manner.](interact_predict/pph_rate/pph_non_interact.png){#fig-pph-no}
+
+### 16. `ppr_rate`
+
+![Interaction effect of potentially preventable readmissions (x-axis) and Medicare spending per episode and the number of Medicare cost calculation episodes (y-axis). The non-parallel trend lines indicate that readmissions have a stronger negative impact on Medicare episode count in high-quality agencies compared to low-quality agencies. Conversely, Medicare spending per episode exhibits an opposite trend, with a negative association in high-quality agencies and a positive correlation in low-quality agencies.](interact_predict/ppr_rate/ppr_interact.png){#fig-ppr-interact}
+
+
+### 17. `medicare_spending_index`
+
+![Interaction Effect of Medicare spending index (x-axis) and the number of Medicare episodes used in cost calculations (y-axis). The non-paralleltrend lines indicate that higher spending is positively correlated with more episodes in high-quality agencies, while the effect is less pronounced in low-quality agencies.](interact_predict/medicare_spending_index/medicare_interact.png){#fig-medicare-interact}
+
+
+## C. Tuning Parameter Analysis 
+### 1. Basic Recipe
+#### a) Elastic net 
+
+@fig-accuracy-en-basic and @fig-roc-en-basic, illustrate the effect of regularization strength and Lasso penalty proportion on **elastic net model**. 
+
+![Effect of Regularization and Lasso Proportion on Model Accuracy.](tune_plot/basic/en_accuracy_basic.png){#fig-accuracy-en-basic}
+
+As shown in @fig-accuracy-en-basic, when `regularization` is **low (< 0.1)**, accuracy remains **high and stable** across all Lasso proportions, indicating that the model learns effectively without excessive constraint. However, as **regularization increases beyond 0.1**, accuracy begins to **decline sharply**, with the most severe drop occurring at the highest regularization levels. This suggests that excessive regularization forces too much shrinkage on the model parameters, leading to underfitting.
+
+![Effect of Regularization and Lasso Proportion on ROC-AUC.](tune_plot/basic/en_roc_basic.png){#fig-roc-en-basic}
+
+The impact of the `Lasso proportion` is particularly evident at higher regularization values in @fig-roc-en-basic. Models with higher Lasso penalties **(0.8889, represented by pink and purple lines)** show the steepest accuracy declines, likely because Lasso aggressively removes features, which may include valuable predictors. In contrast, models with lower Lasso proportions **(0.0 and 0.1111, represented by red and yellow lines)** maintain accuracy longer as regularization increases. This suggests that Ridge-dominated penalties provide greater stability under strong regularization.
+
+#### b) K-nearest neighbors
+
+@fig-roc-knn-basic and @fig-accuracy-knn-basic, illustrate the impact of `k` (the number of nearest neighbors) on `ROC-AUC` and `accuracy` in a **k-Nearest Neighbors (KNN) model**. 
+
+![Effect of Number of Nearest Neighbors on ROC-AUC](tune_plot/basic/knn_roc_basic.png){#fig-roc-knn-basic}
+
+In @fig-roc-knn-basic, which examines `ROC-AUC`, performance improves rapidly as `k` increases from very small values, with the most significant gains occurring between **k = 1 and k = 40**. Beyond **k = 40**, the curve flattens, indicating diminishing returns. This suggests that small `k` values may lead to **overfitting**, where predictions are highly sensitive to noise, while increasing `k `stabilizes the model by averaging over more neighbors. However, at very high values of `k`, ROC-AUC remains stable, suggesting that the model's ability to separate classes does not significantly deteriorate.
+
+![Effect of Number of Nearest Neighbors on Accuracy.](tune_plot/basic/knn_accuracy_basic.png){#fig-accuracy-knn-basic}
+
+In @fig-accuracy-knn-basic, which examines `accuracy`, a slightly different pattern emerges. Accuracy increases sharply at small values of `k`, peaking around **k = 15 to 20**, and then begins to gradually decline. This indicates that choosing a very large k value may lead to **underfitting**, where the model generalizes too much and loses precision in decision-making. Unlike ROC-AUC, which stabilizes at higher k values, accuracy decreases at very large k values, suggesting that the model’s ability to correctly classify individual instances weakens when too many neighbors are considered.
+
+#### c) Random Forest 
+
+@fig-accuracy-rf-basic and @fig-roc-rf-basic examine the impact of minimal node size, the number of randomly selected predictors, and the number of trees on `ROC-AUC` and `accuracy` in a **random forest model**. These hyperparameters influence the model’s ability to effectively separate classes and maintain overall predictive correctness.
+
+
+![Effect of Minimal Node Size and Randomly Selected Predictors on ROC-AUC in Random Forest model.](tune_plot/basic/rf_roc_basic.png){#fig-roc-rf-basic}
+
+In @fig-roc-rf-basic, which focuses on `ROC-AUC`, performance increases sharply when the number of `randomly selected predictors` is small, peaking around **10 predictors** across all minimal node sizes. Beyond this point, `ROC-AUC` slightly declines, suggesting that selecting too many predictors may introduce redundancy or unnecessary complexity. Additionally, smaller `minimal node sizes` **(2 and 14)** achieve slightly higher ROC-AUC values compared to larger node sizes **(27 and 40)**, indicating that finer splits allow for more precise class separation. While the number of `trees` does contribute to performance initially, `ROC-AUC` stabilizes once **at least 500-1000 trees** are used, implying that adding more trees beyond this threshold provides minimal benefit.
+
+![Effect of Minimal Node Size and Randomly Selected Predictors on Accuracy in a Random Forest model.](tune_plot/basic/rf_accuracy_basic.png){#fig-accuracy-rf-basic}
+
+The @fig-accuracy-rf-basic, which examines `accuracy`, follows a similar trend. Accuracy increases quickly with fewer `predictors` and reaches its peak around **10 predictors** before declining slightly. This suggests that an optimal number of predictors exists, beyond which additional features may not provide meaningful improvements. Additionally, smaller `minimal node sizes` **(2 and 14)** consistently yield slightly higher accuracy than larger node sizes **(27 and 40)**, reinforcing the idea that finer splits improve the model’s ability to capture patterns in the data. Similar to `ROC-AUC`, the number of trees does not significantly impact `accuracy` once **at least 500 trees** are used, as performance remains stable across different tree counts.
+
+#### d) Boosted Tree
+@fig-roc-bt-basic and @fig-accuracy-bt-basic illustrate how learning rate, minimal node size, and the number of trees influence `ROC-AUC` and `accuracy` in a **boosted tree model**. These hyperparameters are essential in tuning the model for optimal performance, ensuring both strong classification ability and generalizability.
+
+![Effect of Learning Rate, Randomly Selected Predictors, Minimal Node Size, and Number of Trres on ROC-AUC in Boosed Tree Models](tune_plot/basic/bt_roc_basic.png){#fig-roc-bt-basic}
+
+In @fig-roc-bt-basic, which examines `ROC-AUC`, performance improves as the `learning rate` increases, with the most significant gains occurring between $10^{-4}$ and $10^{-2}$. This suggests that very small `learning rates` slow down convergence, whereas moderate values help the model learn efficiently. `Minimal node size` also plays a role, with smaller node sizes **(2 and 14)** producing slightly higher ROC-AUC values than larger ones **(27 and 40)**. This indicates that finer splits allow the model to separate classes more effectively. Additionally, the number of `trees` significantly impacts ROC-AUC, with **2000 trees** consistently achieving the highest values. In contrast, models trained with only **100 trees** perform the worst, highlighting the importance of sufficient boosting iterations. However, the number of `randomly selected predictors` does not appear to meaningfully impact ROC-AUC, as trends remain similar across different predictor settings.
+
+![Effect of Minimal Node Size and Randomly Selected Predictors on Accuracy in a Random Forest model.](tune_plot/basic/bt_accuracy_basic.png){#fig-accuracy-bt-basic}
+
+@fig-accuracy-bt-basic, which examines `accuracy`, follows a similar pattern to ROC-AUC. Accuracy increases sharply with the `learning rate`, stabilizing around $10^{-2}$. Like in the ROC-AUC plot, smaller `minimal node sizes` **(2 and 14)** result in slightly better accuracy than larger node sizes **(27 and 40)**, reinforcing the idea that finer splits improve the model’s ability to capture patterns in the data. Furthermore, the number of `trees` plays a crucial role in boosting accuracy, with **2000 trees** consistently leading to the best performance. On the other hand, models trained with **only 100 trees** perform significantly worse, confirming that a higher number of trees is necessary for optimal results. Similar to ROC-AUC, the number of `randomly selected predictor`s does not significantly impact accuracy, as trends remain consistent across different settings.
+
+### 2. Complex Recipe
+#### a) Elastic net
+
+![Effect of Regularization and Lasso Proportion on Model Accuracy.](tune_plot/complex/en_accuracy_complex.png){#fig-accuracy-en-complex}
+
+@fig-accuracy-en-complex and @fig-roc-en-complex illustrate how regularization strength and the proportion of the `Lasso penalty` influence model performance, specifically in terms of `accuracy` and `ROC-AUC`. In both cases, model performance remains high when regularization is minimal, with `ROC-AUC` values ***close to 1.0*** and `accuracy` ***around 0.95*** for all proportions of Lasso penalties. However, as regularization increases beyond 0.1, a noticeable decline occurs, with the most severe drop observed in Lasso-dominant models **(0.8889 and 1.0)**, represented by the pink and purple lines in @fig-accuracy-en-complex and @fig-roc-en-complex. This suggests that Lasso's aggressive feature selection, which forces many coefficients to zero, can lead to underfitting when regularization is too strong.  
+
+
+![Effect of Regularization and Lasso Proportion on ROC-AUC.](tune_plot/complex/en_roc_complex.png){#fig-roc-en-complex}
+
+In contrast, Ridge-dominant models (**Lasso proportions 0.0 and 0.1111**) maintain stability longer as regularization increases. Ridge regularization shrinks coefficients but does not eliminate them entirely, making it more robust under high regularization settings. This pattern is particularly evident in the accuracy plot, where Ridge-based models experience a more gradual decline, while Lasso-heavy models suffer a sharp accuracy drop beyond ***a regularization value of 0.1***. The optimal balance between overfitting and underfitting appears to occur when ***regularization is small but nonzero (0.01 - 0.1)***. Within this range, models effectively prevent overfitting while preserving strong `accuracy` and `ROC-AUC`.
+
+#### b) K-nearest neighbors
+
+@fig-accuracy-knn-complex and @fig-roc-knn-complex illustrate how the number of nearest neighbors (`k`) impacts the performance of a **KNN model** in terms of `accuracy` and `ROC-AUC`. @fig-accuracy-knn-complex shows that `accuracy` increases sharply as `k` grows from very small values, peaking around **15-20 neighbors**. At lower `k` values (e.g., **1-5**), accuracy is noticeably lower, likely due to high variance and sensitivity to noise, which causes overfitting. However, after reaching an optimal point, accuracy starts to **decline gradually beyond `k` = 20**, suggesting a shift toward underfitting, where the model becomes too generalized and fails to capture important patterns.
+
+![Effect of Number of Nearest Neighbors on Accuracy.](tune_plot/complex/knn_accuracy_complex.png){#fig-accuracy-knn-complex}
+
+
+@fig-roc-knn-complex, which depicts `ROC-AUC` versus the number of nearest neighbors, follows a similar trend. `ROC-AUC` increases rapidly at small `k` values, stabilizing around **`k` = 20-30.** Unlike accuracy, however, `ROC-AUC` does not decline significantly at high `k` values, indicating that even when accuracy drops due to underfitting, the model still maintains a good ranking ability in classification tasks. This suggests that while a very high `k` might reduce the model’s predictive power, it does not necessarily worsen its ability to separate classes.
+
+
+![Effect of Number of Nearest Neighbors on ROC-AUC](tune_plot/complex/knn_roc_complex.png){#fig-roc-knn-complex}
+
+Overall, the findings suggest that **small `k` values (1-5) result in overfitting**, leading to poor generalization and unstable performance. An optimal `k` value of around **15-30** provides the best balance between bias and variance, maximizing both `accuracy` and `ROC-AUC`. As **`k` increases beyond 30**, the model becomes too smooth, causing `accuracy` to decline due to underfitting, although `ROC-AUC` remains relatively stable. This highlights the importance of selecting an appropriate k—too low makes the model too sensitive to noise, while too high sacrifices predictive power.
+
+#### c) Random Forest 
+
+@fig-accuracy-rf-complex @fig-roc-rf-complex provide insight into how `minimal node size` and the `number of randomly selected predictors` affect the performance of a **random forest model** in terms of `accuracy` and `ROC-AUC`. In @fig-accuracy-rf-complex, performance improves sharply when the number of randomly selected predictors is low, peaking around **10 predictors**. This suggests that with fewer predictors, the model can effectively capture the most important features without being overwhelmed by noise. However, as the number of predictors increases beyond this point, accuracy begins to decline, indicating that including too many predictors might introduce unnecessary complexity and redundancy, which ultimately hampers the model's performance.
+
+![Effect of Minimal Node Size and Randomly Selected Predictors on Accuracy in a Random Forest model.](tune_plot/complex/rf_accuracy_complex.png){#fig-accuracy-rf-complex}
+
+Similarly, @fig-roc-rf-complex mirrors these trends. The `ROC-AUC` values rise rapidly with a small number of predictors and stabilize around **10 predictors**, demonstrating that the model achieves its best class-separability when focusing on a concise subset of features. The plots also reveal that `minimal node size` plays a significant role; smaller node sizes (for example, values like **2** and **14**) tend to achieve slightly better `accuracy` and `ROC-AUC` compared to larger node sizes (such as **27** and **40**). This suggests that a more sensitive splitting criterion allows the random forest to capture nuanced patterns in the data, thereby enhancing predictive performance.
+
+![Effect of Minimal Node Size and Randomly Selected Predictors on ROC-AUC in Random Forest model.](tune_plot/complex/rf_roc_complex.png){#fig-roc-rf-complex}
+
+Another important observation is that the `number of trees` in the forest appears to have a minimal impact on both `accuracy` and `ROC-AUC` across the settings explored. This implies that once a sufficient number of `trees` is reached, additional trees do not contribute significant improvements in model performance. Overall, the key takeaway is that for this random forest model, an optimal configuration appears to involve selecting around **10 randomly selected predictors** and employing smaller minimal node sizes, which together strike a balance between complexity and generalizability, yielding high `accuracy` and robust `ROC-AUC`.
+
+#### d) Boosted Tree 
+
+@fig-accuracy-bt-complex and @fig-roc-bt-complex illustrate how learning rate, minimal node size, and the number of trees impact `accuracy` and `ROC-AUC` in a **boosted tree model**. These hyperparameters play a crucial role in determining model performance and its ability to generalize effectively. 
+
+![Effect of Learning Rate, Randomly Selected Predictors, Minimal Node Size, and Number of Trres on Accuracy in Boosed Tree Models](tune_plot/complex/bt_accuracy_complex.png){#fig-accuracy-bt-complex}
+
+In @fig-accuracy-bt-complex, which examines `accuracy`, there is a clear trend where accuracy **increases as the learning rate rises**, with the most significant improvement occurring between $10^{-4}$ and $10^{-2}$. This suggests that very small learning rates may slow down learning, while moderate `learning rates` allow the model to converge more efficiently. Additionally, `minimal node size` plays a noticeable role in `accuracy`— smaller minimal node sizes **(2 and 14)** tend to achieve slightly higher accuracy compared to larger ones **(27 and 40).** This indicates that finer splits allow the model to capture more detailed patterns in the data. Another key observation is that more `trees` consistently improve `accuracy`, with **2000 trees** achieving the highest performance. The performance gap between **100 trees and 2000 trees is substantial,** reinforcing the importance of having a sufficient number of trees in a boosted model. However, the number of `randomly selected predictors` does not significantly impact accuracy, as trends remain stable across different predictor settings.
+
+![Effect of Learning Rate, Randomly Selected Predictors, Minimal Node Size, and Number of Trres on ROC-AUC in Boosed Tree Models](tune_plot/complex/bt_roc_complex.png){#fig-roc-bt-complex}
+
+@fig-roc-bt-complex, which examines `ROC-AUC`, follows a similar trend to `accuracy`. `ROC-AUC` improves sharply with increasing `learning rates`, stabilizing around $10^{-2}$. Similar to `accuracy`, `minimal node size` significantly influences `ROC-AUC`, with smaller node sizes **(2 and 14)** producing higher values than larger node sizes **(27 and 40).** This suggests that deeper splits enhance the model’s ability to distinguish between classes. Furthermore, adding more `trees` leads to better `ROC-AUC` performance, with **2000-tree models achieving the highest values**. Conversely, models with only 100 trees perform significantly worse, emphasizing the necessity of a large ensemble for strong predictive performance. Importantly, the number of `randomly selected predictors` does not have a major impact on ROC-AUC, as performance remains stable across different predictor settings.
+
+## H. Use of Generative AI
+
+I used ChatGPT to improve sentence flow, check grammar, and make my writing more concise. 
+
+
+
+
+
