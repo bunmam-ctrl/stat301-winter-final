@@ -22,7 +22,7 @@ citation-location: margin
 ::: {.callout-tip icon=false}
 
 ## Github Repo Link
-[Tran Chau's Github Repo](https://github.com/stat301-2-2025-winter/final-project-2-bunmam-ctrl.git)
+[Tran Chau's Github Repo](https://github.com/bunmam-ctrl/stat301-winter-final.git)
 
 :::
 
