@@ -1,0 +1,189 @@
+---
+title: "Progress Memo 2"
+subtitle: |
+  | Final Project 
+  | Data Science 2 with R (STAT 301-2)
+author: "Chau Tran"
+pagetitle: "PM2 Chau Tran"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    
+execute:
+  warning: false
+
+from: markdown+emoji 
+reference-location: margin
+citation-location: margin
+---
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+[Tran Chau's Github Repo](https://github.com/stat301-2-2025-winter/final-project-2-bunmam-ctrl.git)
+
+:::
+
+# Analysis Plan for Predicting Quality Star Category
+
+## Target Variable Transformation
+
+The target variable, `quality_star_rating`, is transformed into a binary classification problem to simplify the prediction task. The new categories are defined as:
+
+- `Good`: Facilities with `quality_star_rating` of 3.5 or higher.
+
+- `Low`: Facilities with `quality_star_rating` below 3.5.
+
+This transformation converts the original rating scale into a two-class problem, allowing machine learning models to classify facilities into either a higher-quality (`Good`) or lower-quality (`Low`) catefory. This simplification enhances interpretability and ensures models focus on distinguishing between well-perfroming and underperforming facilities. 
+
+## Data Splitting
+
+To train and evaluate predictive models effectively, the dataset is divided into **80% training** and  **20% testing**. The training set is used for model development, while the test set acts as an unseen dataset for final performance evaluation. Since class imbalances may affect model performance, stratified sampling is applied to preserve the proportion of `Good` and `Low` categories in both sets. This prevents biases in model learning and ensures a more representative dataset.
+
+To further enhance evaluation reliability, **10-fold cross validation with 5 repeats** is implemented. This method divides the training data in 10 subsets, where the model is trained on 9 subsets and validated on the reamining 1. The process is repeated 5 times to reduce the risk of overfitting and provide more stable performance estimates. Stratification is maintained within the folds to ensure class distribution remains balanced throughout model training.
+
+
+## Feature Engineering (Recipes)
+
+Since different machine learning models require different input formats, preprocessing is customized for linear models (e.g., logistic regression, elastic net) and tree-based models (e.g., random forests, boosted trees).
+
+### Linear Model Preprocessing Pipelines
+
+The linear model recipe  follows a structured preprocessing approach to prepare the data for model training. The key steps include:
+
+- **Removing non-predictive identifiers**, such as `State`, `CMS Certification Number (CCN)`, `Telephone Number`, `Provider Name`, `Address`, `City/Town`, `ZIP Code`, and `Certification Date`. These fields do not contribute to prediction and are excluded to prevent data leakage.
+
+- **Filtering out zero-variance predictors**, ensuring that features with no variability are removed before further processing.
+
+- **Imputing missing values:**
+
+  - *Mean imputation* is applied to numerical predictors to replace missing values with the average of available observations.
+  
+  - *Mode imputation* is used for categorical predictors, filling in missing values with the most frequent category.
+  
+- **One-hot encoding categorical variables**, converting them into binary indicators for compatibility with the model.
+
+- **Rechecking for zero-variance predictors**, ensuring that no constant-value features remain after encoding.
+
+- **Normalizing numerical predictors**, standardizing numerical features to a uniform scale, which is particularly beneficial for models relying on distance-based calculations or gradient-based optimization, such as logistic regression.
+
+
+### Tree-Based Model Preprocessing Pipeline
+
+The tree-based model recipe follows a similar preprocessing workflow but includes modifications to align with the characteristics of tree-based algorithms. The key steps include:
+
+- **Removing non-predictive identifiers**, excluding the same set of fields as the linear model recipe to prevent data leakage.
+
+- **Filtering out zero-variance predictors**, removing features that do not contribute to differentiation in the dataset.
+
+- **Imputing missing values:**
+
+  - *Mean imputation* is used for numerical predictors.
+  
+  - *Mode imputation* is applied to categorical predictors.
+
+- **One-hot encoding categorical variables** with an explicit one-hot format (`one_hot = TRUE`), ensuring that each category is represented by a separate binary column. This approach provides better handling of categorical variables in tree-based models.
+
+- **Normalizing numerical predictors**, standardizing numerical values. While tree-based models generally do not require normalization, this step is retained for consistency across preprocessing pipelines.
+
+## Model Selection
+A diverse set of classification models will be used to compare performance and select the best approach:
+
+
+| Model Type          | Description | 
+|:---------------------|-----------------:|
+| Null Model         |       Baseline model that predicts the most frequent class.          |    
+| Logistic Regression         |      Simple, interpretable model assuming linear relationships.         |    
+| Elastic Net  |          Regularized logistic regression with tuning penalties and mixture.     |           
+| Random forest        |        Ensemble model that reduces variance and captures non-linear patterns.         |      
+| Boosted tree         |        Distance-based model that classifies based on the closest examples in the training set.          |        
+| K-Nearest Neighbors (KNN)           |        Gradient boosting technique that improves weak models iteratively for higher accuracy.          |               
+
+: Overview of Machine Learning Models for Quality Star Prediction {#tbl-model-use .striped .hover}
+
+These models will be trained using the preprocessed datasets and evaluated using cross-validation.
+
+## Assessment Metrics
+
+Model performance will be measured using three key metrics:
+
+- **Accuracy:** The proportion of correctly classified instances, providing a general measure of model effectiveness.
+
+- **F1 Score:** A balanced measure of precision and recall, which is particularly useful when dealing with potential class imbalances.
+
+- **ROC-AUC:** Measures how well the model distinguishes between "Good" and "Low" categories across different classification thresholds.
+
+These metrics ensure that both overall correctness and the ability to distinguish between classes are thoroughly evaluated.
+
+# Evaluation of Model Performance: Identifying Issues and Next Steps
+
+![Model Performance Metrics for Quality Star Classification](table/accuracy_table_reformat.png){#tbl-accuracy .striped .hover}
+
+
+@tbl-accuracy presents the evaluation metrics for different models used to classify healthcare facilities into `Good` and `Low` quality categories.^[I used this link to create the table [Package ‘flextable’](https://cran.r-project.org/web/packages/flextable/flextable.pdf)] The key performance metrics include:  
+
+- **Accuracy**: The proportion of correctly classified cases.  
+- **F1 Score**: A balance between precision and recall, important for handling imbalanced data.  
+- **ROC-AUC**: The model’s ability to distinguish between the two classes.  
+
+## Null Model
+
+According to @tbl-accuracy , the null model serves as a baseline by making predictions without using any actual predictors. Typically, it predicts the majority class or randomly assigns classes based on prior probabilities.
+
+- **Accuracy: 0.518**
+
+  - This suggests that the majority class makes up about 51.8% of the dataset, meaning the dataset is somewhat imbalanced.
+  
+- **F1 Score: 0.683**
+
+  - The relatively high F1 score suggests that even though the null model is simplistic, the class distribution may not be extremely skewed.
+  
+- **ROC-AUC: 0.500**
+
+  - This is the worst possible ROC-AUC score, indicating that the model performs no better than random chance.
+
+## Logistic Regression
+
+According to @tbl-accuracy, logistic regression is a more sophisticated model that uses input features to make predictions.
+
+- **Accuracy: 0.946**
+
+  - A significant improvement over the null model, showing that logistic regression is highly effective in distinguishing between `Good` and `Low` quality categories.
+  
+- **F1 Score: 0.948**
+
+  - A very high F1 score, indicating a strong balance between precision and recall. This suggests that misclassification rates are very low.
+  
+- **ROC-AUC: 0.989**
+
+  - This indicates near-perfect discrimination ability, meaning the model is very effective at ranking positive cases higher than negative cases.
+
+# Next Steps
+
+##  Exploring Additional Models with Hyperparameter Tuning
+
+Beyond logistic regression, additional models such as Elastic Net, Random Forest, Boosted Trees (Gradient Boosting), and K-Nearest Neighbors (KNN) will be explored. To optimize their performance, hyperparameter tuning will be applied using techniques like grid search, ensuring the selection of the best model configurations for improved classification accuracy and robustness. 
+
+
+## Conducting Exploratory Data Analysis (EDA)
+
+A comprehensive EDA will be performed on the training dataset to uncover patterns, detect skewness, outliers, correlations, and evaluate missing data distributions. This analysis will also focus on identifying potential interactions between predictors and the target variable, which can be incorporated into model design. Key analyses will include:
+
+
+- Visualizing feature distributions using histograms, boxplots, and bar charts to detect skewness and outliers.
+
+- Identifying correlated features with heatmaps to mitigate redundancy and multicollinearity.
+
+- Exploring interactions between predictors and the target variable through feature interaction plots, grouped summaries, and pairwise dependency analysis.
+
+Findings from EDA will help refine the preprocessing pipeline by informing feature selection, imputation strategies, and interaction terms for model improvement.
+
+
+
+
+
+
+
+

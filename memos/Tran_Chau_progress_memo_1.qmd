@@ -1,0 +1,150 @@
+---
+title: "Progress Memo 1"
+subtitle: |
+  | Final Project 
+  | Data Science 2 with R (STAT 301-2)
+author: "Chau Tran"
+pagetitle: "PM1 Chau Tran"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    
+execute:
+  warning: false
+
+from: markdown+emoji 
+reference-location: margin
+citation-location: margin
+---
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+[Tran Chau's final report Github repo](https://github.com/stat301-2-2025-winter/final-project-2-bunmam-ctrl.git)
+
+:::
+
+## Prediction Problem
+In December 2023, seven-year-old Deonte Atwell from Florida, a child requiring round-the-clock skilled nursing care due to severe medical conditions, died from extreme malnutrition. Despite having the necessary medical supplies, including 264 unopened bottles of feeding formula, he was neglected by both his family and home health caregivers. The systemic failure to provide adequate care led to his tragic death, resulting in multiple criminal charges, including felony murder and Medicaid fraud, against those responsible.^[[PEOPLE.COM](https://people.com/boy-7-died-of-severe-malnutrition-on-christmas-day-his-family-and-caregivers-are-charged-in-his-death-8710764)] 
+
+
+This heartbreaking case underscores the urgent need for a classification-based supervised predictive model to assess home healthcare quality. The objective of this prediction problem is to develop a classification model that accurately estimates the `Quality of Patient Care Star Rating` for home health agencies on a scale from **1 to 5**, helping families make informed decisions about care providers. By leveraging supervised learning techniques, this project will analyze key indicators of home healthcare performance, including patient outcomes, service effectiveness, and compliance with medical guidelines, to build a robust predictive system. The goal is to ensure that vulnerable patients receive high-quality, compassionate care, preventing failures that could lead to tragic consequences.
+
+
+## Data source
+
+The [Home Health Care Agencies Dataset](https://data.cms.gov/provider-data/dataset/6jpm-sxkc#data-table) from the **Centers for Medicare & Medicaid Services (CMS) Provider Data Catalog** serves as the foundation for developing a predictive model to estimate the `Quality of Patient Care Star Rating` for home health agencies. This dataset provides a comprehensive list of all Medicare-registered home health agencies, offering crucial details for evaluating healthcare quality and accessibility.
+
+### Target variable
+- `Quality of Patient Care Star Rating` (1–5 star rating assigned by CMS based on various performance measures)
+
+
+### Predictors
+   -The **Home Health Care Agencies Dataset** from the **Centers for Medicare & Medicaid Services (CMS) Provider Data Catalog** serves as the foundation for developing a predictive model to estimate the Quality of Patient Care Star Rating for home health agencies. This dataset includes a comprehensive list of all Medicare-registered home health agencies, offering detailed information on agency services, quality measures, patient outcomes, and financial data.  
+
+### Target Variable  
+- **Quality of Patient Care Star Rating** (1–5 star rating assigned by CMS based on various performance measures)
+
+### Predictor Variables 
+1. **Agency and Service Characteristics**
+    - Type of Ownership (Categorical: For-profit, Nonprofit, Government-owned)  
+    - Offers Nursing Care Services (Yes/No)  
+    - Offers Physical Therapy Services` (Yes/No) 
+    - Offers Occupational Therapy Services (Yes/No) 
+    - Offers Speech Pathology Services (Yes/No)  
+    - Offers Medical Social Services (Yes/No)  
+    - Offers Home Health Aide Services (Yes/No)
+
+2. **Timeliness and Care Delivery Measures**
+    - How often the home health team began their patients' care in a timely manner (%)
+    - How often the home health team determined whether patients received a flu shot for the current flu season (%)  
+
+3. **Patient Improvement and Functional Outcomes**
+    - How often patients got better at walking or moving around(%) 
+    - How often patients got better at getting in and out of bed`(%) 
+    - How often patients got better at bathing (%) 
+    - How often patients' breathing improved (%)
+    - How often patients got better at taking their drugs correctly by mouth(%)
+    - Changes in skin integrity post-acute care: pressure ulcer/injury (%) 
+
+3. **Medication and Safety Compliance**
+    - How often physician-recommended actions to address medication issues were completed timely (%) 
+    - Percent of residents experiencing one or more falls with major injury (%) 
+
+4. **Care Coordination and Information Transfer**
+    - Discharge Function Score (Numerical variable reflecting functional improvement at discharge)    
+    - Transfer of Health Information to the Provider (%) 
+    - Transfer of Health Information to the Patient (%)
+
+5. **Financial and Performance Metrics**
+    - DTC (Discharge to Community) Performance Categorization (Categorical: “Better than National Rate”, “Worse than National Rate”, or “Same as National Rate”) 
+    - PPH (Potentially Preventable Hospitalization) Performance Categorization (Categorical: “Better than National Rate”, “Worse than National Rate”, or “Same as National Rate”)  
+    - PPR (Potentially Preventable Readmissions) Performance Categorization (Categorical: “Better than National Rate,” “Worse than National Rate,” or “Same as National Rate”) 
+    - How much Medicare spends on an episode of care at this agency, compared to Medicare spending across all agencies nationally (Cost index relative to national average)  
+    - Number of episodes used to calculate how much Medicare spends per episode of care at agency, compared to spending at all agencies (national level) (Count variable for cost calculations)*  
+
+### Application of the Model 
+By leveraging classification-based analysis, this model will evaluate the relationship between agency characteristics, quality measures, patient outcomes, and financial metrics to predict the `Quality of Patient Care Star Rating.` Understanding these relationships will empower patients and families to make informed decisions when selecting a home health agency, ensuring they receive high-quality care tailored to their needs. Additionally, the model will help healthcare providers assess their performance relative to competitors, identify areas for improvement, and implement strategies to enhance patient outcomes. Furthermore,regulators and policymakers can utilize the insights from this model to enforce accountability in home health services, ensuring that agencies meet established standards and improve overall healthcare quality. By developing a data-driven system for evaluating and predicting home health agency performance, this project aims to enhance transparency, drive quality improvements, and ultimately improve patient care outcomes in the home healthcare sector.
+
+## Data quality check
+The [Home Health Care Agencies Dataset](https://data.cms.gov/provider-data/dataset/6jpm-sxkc#data-table) provides key insights into the quality of care provided by agencies, with **12,015 observations** and **34 variables** covering agency characteristics, patient outcomes, and financial performance (@tbl-hhs-summary). While missing values are present, they account for only **21%** of the total dataset (**~84,227 missing values**), meaning they are unlikely to severely impact model accuracy if handled correctly. However, certain critical predictors have missing values, which could introduce bias into the predictive model for Quality of Patient Care Star Ratings. Below is an analysis of missingness by category, referencing the figures provided.
+
+```{r}
+#| label: tbl-hhs-summary
+#| tbl-cap: "Summary Statistics of the Home Health Care Agencies Dataset."
+#| echo: false
+
+load(here::here("predictor_check/hhs_summary.rda"))
+knitr::kable(hhs_summary)
+```
+
+The **agency and service-related** variables show missing values in key indicators such as `ownership_type` **(~1,700 missing values)**, `nursing_services` **(~1,700 missing)**, and `home_aide` **(~1,700 missing)** (@fig-na-agency-service). These missing values could lead to misclassification of agencies if imputation is not done correctly. For example, agencies that fail to report their service offerings may incorrectly appear to provide fewer services, potentially skewing their predicted quality rating. Mode-based imputation, using the most frequently occurring values, can help maintain data consistency.
+
+![Missing values in predictors categorized as agency and service characteristics.](predictor_check/na_predictors.png){#fig-na-predictor}
+
+**Timeliness of care** is one of the most critical predictors of home health quality, yet **~3,500 missing values** in `timely_care` could impact the model’s ability to assess agency responsiveness (@fig-na-predictor). Since prompt care initiation is closely linked to lower hospital readmission rates, failing to account for missing data may allow some agencies to artificially appear more efficient than they actually are. Additionally, `flu_shot_check` **(~3,800 missing values)** exhibits the highest missingness in this category. While this is not a direct measure of care quality, its absence may limit the model’s ability to incorporate patient safety measures into predictions. Median imputation can help reduce potential distortions in the dataset.
+
+
+**Patient improvement outcomes** exhibit missing values in functional recovery measures, including `improve_walking` **(~4,100 missing)**,`improve_bathing` **(~4,100 missing)**, and `improve_bed_transfer` **(~4,200 missing)** (@fig-na-predictor). These metrics are essential for evaluating whether home health agencies are effectively helping patients regain independence. The highest missingness in this category is in `skin_integrity` **(~4,000 missing values)**, which is crucial for monitoring post-acute care complications such as pressure ulcers. If these data gaps are systematic—meaning that agencies with poorer outcomes are failing to report them—the model might overestimate the quality of certain providers. Regression-based imputation can be used to estimate missing values based on correlated patient improvement metrics.
+
+
+**Medication and safety compliance**  also reveal gaps, particularly in `fall_injury_rate` **(~3,500 missing values)** and `med_issue_resolved` **(~3,500 missing values)** (@fig-na-predicto). Falls and medication errors are significant contributors to avoidable hospital readmissions, making these variables highly relevant for prediction. Missing data in this category could lead to underreporting of safety risks, giving some agencies undeservedly high ratings. A deeper analysis is needed to determine if these missing values are random or systematic, as lower-rated agencies may be less likely to report negative outcomes.
+
+
+**Financial and performance metrics** also contain notable missing values, particularly in `medicare_spending_index` **(~3,800 missing values)**, `ppr_accuracy` **(~3,100 missing)**, and `dtc_category` **(~2,900 missing)**. Since financial efficiency is an important factor in healthcare quality assessments, missing values in Medicare spending and readmission performance may limit the model’s ability to distinguish cost-effective providers from inefficient ones. Predictive imputation using agency-level financial trends may be necessary to ensure the model maintains its accuracy in cost-related evaluations.
+
+### Impact on Predictive Modeling and Recommendations 
+
+If lower-rated agencies systematically underreport data, the model may overestimate their quality, leading to misclassification and misleading recommendations.  To mitigate these risks, **mode imputation** should be applied to categorical variables (e.g., agency and service-related variables), while **median imputation** should handle numerical predictors (e.g., timely care, financial metrics). For complex relationships, **KNN imputation** can refine missing values in medication adherence and patient safety measures.^[[Introduction to Data Imputation](https://www.simplilearn.com/data-imputation-article)]  
+
+Additionally, **sensitivity analysis** should check whether missingness is biased toward low-rated agencies, adjusting imputations accordingly to prevent artificial score inflation. If missingness affects data balance, **SMOTE resampling** can help ensure fair classification across all star ratings.^[[How to Use SMOTE for an Imbalanced Dataset](https://www.turing.com/kb/smote-for-an-imbalanced-dataset)] These preprocessing steps will enhance the model’s ability to accurately classify home health agencies, providing more reliable insights for patients and caregivers.
+
+## Target variable analysis
+The **Quality of Patient Care Star Rating**, the target variable in this classification model, exhibits a near-normal distribution with a weak peak around 4-start ratings (@fig-target-vis). Lower ratings (1 and 2 stars) have fewer observations, while ratings of 3,4, and 5 starts dominate the distribution, indicating 
+The Quality of Patient Care Star Rating, the target variable in this classification model, exhibits a near-normal distribution with a peak around 4-star ratings. Some ratings (1 and 5 stars) have fewer observations, while ratings of 3 and 4 stars dominate the distribution, indicating that most home health agencies perform at an average to above-average level. 
+
+![Bar plot illustrating the distribution of quality of patient care start ratings among home health agencies](target_check/rating_vis.png){#fig-target-vis}
+
+However, a significant issue is the missingness in the target variable, with **4,185 missing values**, accounting for **34.83%** (@tbl-na-target). This level of missingness poses a substantial risk to model performance, as removing these records could reduce the dataset by over one-third, potetially affecting class-balance. If missing values are not randomly distributed and instead correlates with certaing agency characteristics (lower-performing agencies underreporting data), the model may overestimate quality ratings, leading to biased predictions.
+
+```{r}
+#| label: tbl-na-target
+#| tbl-cap: "Missing values and their percentage in the Quality of Patient Care Star Ratings among home health agencies."
+#| echo: false
+
+load(here::here("target_check/na_target.rda"))
+knitr::kable(na_target)
+```
+
+### Recommendations for Handling Missing Target Values
+
+To ensure accurate classification of **Quality of Patient Care Star Ratings**, it is crucial to assess missingness patterns in relation to service offerings, patient outcomes, and financial performance. If missing values are completely random, they can be removed without bias. Otherwise, predictive imputation using agency attributes, such as timely care and readmission rates, should be applied.  
+
+Additionally, class imbalance favors higher-star ratings, which may skew predictions. To correct this, **SMOTE** can be used to balance low-star ratings. Proper handling of missing values and class distribution will enhance model fairness and accuracy, helping patients make better-informed healthcare decisions.
+
+## Misc
+For this analysis, I have selected **34 key variables** from the original **96-variable dataset** to simplify the model while maintaining its predictive power. Many of the removed variables, such as numerators, denominators, and footnotes, were highly related to the selected features, often representing duplicative or derived information. By eliminating these redundancies, the dataset becomes more concise, manageable, and interpretable. Additionally, I have renamed variables** for clarity and consistency, ensuring smoother data processing and model implementation.  
+
+I am still evaluating whether this supervised learning problem is better suited for **classification or regression modeling**. The target variable, `Quality of Patient Care Star Rating`, consists of nine distinct categories (1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0). While these values are numeric, they represent ordinal categories rather than a continuous distribution, creating ambiguity in choosing between classification or regression. Given the number of categories, a regression approach could capture numerical relationships, but a classification model might be more appropriate since the ratings are discrete and not continuous. 
